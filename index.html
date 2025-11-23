@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สุขสันต์วันเกิดย้อนหลัง ลุงอ้อน! - อภิมหาอลังการ</title>
+    <!-- 2) Preload Fonts for faster loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap" as="style">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Three.js for 3D animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Mali:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for a grand, celebratory look and Thai font */
+        body {
+            font-family: 'Mali', 'Inter', sans-serif;
+            background: #111827; /* Darker background */
+            /* (1) แก้ไข overflow ให้เลื่อนได้เฉพาะแนวตั้ง */
+            overflow-x: hidden;
+            overflow-y: auto;
+            animation: bodyFade 1.2s ease-out;
+        }
+
+        /* 7) Body Fade-in Keyframes */
+        @keyframes bodyFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 6) Aurora Light Background */
+        body::before {
+            content: "";
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, rgba(250, 204, 21, 0.2), transparent 70%),
+                        radial-gradient(circle at bottom, rgba(96, 165, 250, 0.15), transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; 
+        }
+
+        .birthday-card-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* 2) Floating Motion (Card) & 3) Golden Gradient Border (Card) */
+        .birthday-card {
+            background-color: rgba(17, 24, 39, 0.8); 
+            backdrop-filter: blur(8px);
+            max-width: 95%;
+            width: 600px; 
+            padding: 3rem;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7); 
+            border-radius: 24px; /* Ensure consistent rounding */
+
+            /* 3) Golden Gradient Border */
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #facc15, #fbbf24, #f59e0b) 1;
+
+            /* 2) Floating Motion + Initial Scale */
+            transform: scale(1);
+            animation: float 4s ease-in-out infinite, fadeInScale 1s ease-out; 
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.9) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* 2) Floating Motion Keyframes */
+        @keyframes float {
+            0%,100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-12px) scale(1); }
+        }
+
+        /* 4) Glitter Animation around the card */
+        .birthday-card::after {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 28px; /* Slightly larger than card */
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: glitter 2s infinite ease-in-out;
+            pointer-events: none;
+            z-index: -1; 
+        }
+        @keyframes glitter {
+            0% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.01); }
+            100% { opacity: 0.1; transform: scale(1); }
+        }
+        
+        /* 1) Neon Glow for H1 */
+        .neon-glow {
+            text-shadow:
+                0 0 15px #fde047,
+                0 0 30px #facc15,
+                0 0 45px #eab308,
+                0 0 60px #ca8a04;
+        }
+
+        /* 5) Soft Glow for Image & 7) Hover Animation */
+        .img-soft-glow {
+            box-shadow:
+                0 0 20px rgba(253, 224, 71, 0.8),
+                0 0 40px rgba(250, 204, 21, 0.5);
+            transition: all 0.5s ease; /* Ensure smooth transition */
+        }
+        .img-soft-glow:hover {
+            transform: scale(1.05) rotate(1deg);
+        }
+
+        /* 9) Gold Spark Signature */
+        .signature-glow {
+            background: linear-gradient(90deg,
+                #fde047, #facc15, #fbbf24, #fde047);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 100%;
+            animation: shine 3s linear infinite;
+        }
+        @keyframes shine {
+            0% { background-position: -200%; }
+            100% { background-position: 200%; }
+        }
+
+        /* 10) Lens-Flare Sparkle */
+        .sparkle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 30; /* Highest z-index */
+        }
+        .sparkle {
+            position: absolute; 
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            animation: sparkle 2s infinite ease-in-out;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        @keyframes sparkle {
+            0%,100% { transform: scale(0.5); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Confetti & Starfield (existing) */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 20; 
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 18px;
+            background-color: #fff;
+            opacity: 0;
+            border-radius: 4px;
+            transform-origin: 50% 100%;
+            animation: fall 5s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translate3d(0, -100%, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate3d(0, 100vh, 0) rotate(720deg); opacity: 0; }
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #fff;
+            animation: twinkle linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+        
+        /* (2) Wrapper that allows scrolling and padding */
+        main {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            padding: 2rem 1rem 120px 1rem; /* Added horizontal padding to match p-4 removed from body */
+            /* Used flex and min-h-screen to maintain vertical centering when content is short */
+        }
+    </style>
+</head>
+<!-- (3) นำ flex items-center justify-center min-h-screen ออกจาก body เพื่อให้เลื่อนได้ -->
+<body class="p-4"> 
+    
+    <!-- 8) Audio Ambient Sound -->
+    <!-- NOTE: URL 'audio/happy.mp3' is a relative placeholder. You must provide this file on your hosting for it to play. -->
+    <audio id="bg-music" src="audio/happy.mp3" autoplay loop hidden></audio>
+
+    <!-- 6) Mute Button -->
+    <button id="muteBtn" class="fixed top-4 right-4 bg-yellow-500 text-black px-4 py-2 rounded-xl z-50 shadow-lg hover:bg-yellow-400 transition">
+        🔊 เสียง</button>
+
+    <!-- 3D Scene Container (Three.js) -->
+    <div id="scene-container"></div>
+    
+    <!-- Starfield Background Overlay (CSS) -->
+    <div id="starfield" class="fixed top-0 left-0 w-full h-full opacity-30 z-0"></div>
+
+    <!-- Confetti Overlay -->
+    <div id="confetti-container" class="confetti"></div>
+
+    <!-- 10) Sparkle Overlay -->
+    <div id="sparkle-container" class="sparkle-container"></div>
+
+    <!-- (3) Birthday Card Content Wrapped in <main> with centering classes -->
+    <main class="flex items-center justify-center min-h-screen">
+        <!-- Birthday Card Wrapper -->
+        <div class="birthday-card-wrapper relative"> 
+            <div class="birthday-card mx-auto rounded-3xl text-white">
+                
+                <!-- Header (1) Neon Glow -->
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl text-center font-extrabold text-yellow-400 mb-8 neon-glow">
+                    สุขสันต์วันเกิดย้อนหลัง!
+                </h1>
+
+                <!-- Image Section (5, 7) Soft Glow & Hover -->
+                <div class="text-center mb-8">
+                    <!-- 
+                        UPDATED: ใช้ชุดรูปภาพสไลด์โชว์
+                    -->
+                    <img 
+                        id="birthday-image"
+                        src="image/pee.jpg" 
+                        alt="รูป ลุงและพี่" 
+                        class="rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm h-auto object-cover mx-auto img-soft-glow" 
+                        loading="lazy"
+                    />
+                </div>
+
+                <!-- Greeting Message -->
+                <p class="text-xl sm:text-2xl text-center leading-loose mb-8 font-semibold bg-yellow-600/20 p-6 rounded-2xl border border-yellow-400/50 shadow-inner tracking-wider">
+                    สุขสันต์วันเกิดครับ ลุง&พี่ มีความสุขมากๆ สุขภาพแข็งแรงเงินไหลมาเทมา ร่ำๆรวยๆ คิดสิ่งใดได้สิ่งนั้น และก็ขอให้ลุง หล่อๆขึ้นไป ขอให้พี่ สวยๆขึ้นไปมีแฟนเยอะๆด้วย
+                </p>
+                
+                <!-- Signature (9) Gold Spark -->
+                <p class="text-lg sm:text-xl text-center mt-6 font-bold italic signature-glow">
+                    ด้วยรักและเคารพจากสาธุ หลานรัก & น้องสุดหล่อเท่
+                </p>
+
+                <!-- REMOVED: ข้อความตัวเล็กที่มาแบบช้า ๆ -->
+                
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Global Performance & Audio Control Variables ---
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let is3DEnabled = true; // State to track 3D status
+
+        // --- Image Cycling Setup ---
+        // UPDATED: ใช้ชุดรูปภาพ 6 รูปตามที่ผู้ใช้ร้องขอ
+        const imageSources = [
+            "image/pee.jpg",
+            "image/pee2.jpg",
+            "image/pee3.jpg",
+            "image/pee4.jpg",
+            "image/pee5.jpg",
+            "image/pee6.jpg"
+        ];
+        let currentImageIndex = 0;
+        const imageElement = document.getElementById('birthday-image');
+        
+        function cycleImage() {
+            if (imageElement && imageSources.length > 0) {
+                currentImageIndex = (currentImageIndex + 1) % imageSources.length;
+                imageElement.src = imageSources[currentImageIndex];
+            }
+        }
+        // ตั้งเวลาให้เปลี่ยนรูปภาพทุก 4 วินาที (4000 มิลลิวินาที)
+        setInterval(cycleImage, 4000); 
+        
+        // --- 3D Scene (Three.js) Initialization ---
+        let scene, camera, renderer, torusKnot;
+        const container = document.getElementById('scene-container');
+
+        function initThreeJS() {
+            // Check if ThreeJS is available and container exists
+            if (typeof THREE === 'undefined' || !container) {
+                console.warn("Three.js or container not found. Skipping 3D initialization.");
+                is3DEnabled = false;
+                return;
+            }
+
+            // Scene Setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 1.5); 
+            scene.add(ambientLight);
+            
+            const pointLight1 = new THREE.PointLight(0xffffff, 1.5, 100);
+            pointLight1.position.set(5, 5, 5);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0xfacc15, 2, 100); 
+            pointLight2.position.set(-5, -5, -5);
+            scene.add(pointLight2);
+
+            // Torus Knot Geometry (The Grand Element)
+            const geometry = new THREE.TorusKnotGeometry( 5, 1, 100, 16 );
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xffd700, 
+                specular: 0xffffff,
+                shininess: 100,
+                emissive: 0xfacc15, 
+                emissiveIntensity: 0.8
+            });
+
+            torusKnot = new THREE.Mesh(geometry, material);
+            torusKnot.scale.set(0.2, 0.2, 0.2); 
+            torusKnot.position.set(0, 0, -10); 
+            scene.add(torusKnot);
+
+            camera.position.z = 5;
+        }
+
+        // 1) Safe Fallback (FPS check) integrated into animateThreeJS
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+            
+            frameCount++; // Count the frames rendered
+            
+            if (!is3DEnabled) return;
+
+            // Rotation
+            if (torusKnot) {
+                torusKnot.rotation.x += 0.005;
+                torusKnot.rotation.y += 0.005;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            if (!is3DEnabled || !camera || !renderer) return;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // 1) FPS Check Interval (Runs every second)
+        setInterval(() => {
+            if (!is3DEnabled) return;
+            
+            const now = performance.now();
+            const fps = (frameCount * 1000) / (now - lastTime);
+            
+            // Reset for next interval
+            lastTime = now;
+            frameCount = 0;
+
+            if (fps < 20) {
+                // Performance is low, disable 3D
+                if (container) {
+                    container.style.display = "none"; 
+                    is3DEnabled = false;
+                    console.warn(`3D animation disabled due to low FPS (${fps.toFixed(2)} < 20).`);
+                }
+            }
+        }, 1000);
+
+
+        // --- Confetti, Starfield & Sparkle Effects ---
+        const confettiContainer = document.getElementById('confetti-container');
+        const starfieldContainer = document.getElementById('starfield');
+        const sparkleContainer = document.getElementById('sparkle-container');
+        const colors = ['#f43f5e', '#a855f7', '#facc15', '#22c55e', '#3b82f6'];
+
+        function createConfettiPiece() {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.left = `${Math.random() * 100}vw`;
+            piece.style.opacity = '1';
+            piece.style.animationDelay = `${Math.random() * 5}s`;
+            piece.style.animationDuration = `${(Math.random() * 3) + 4}s`;
+            piece.style.transform = `rotate(${Math.random() * 720}deg)`;
+            confettiContainer.appendChild(piece);
+
+            setTimeout(() => piece.remove(), 8000); 
+        }
+
+        function createStars() {
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                star.style.animationDuration = `${(Math.random() * 2) + 3}s`;
+                starfieldContainer.appendChild(star);
+            }
+        }
+        
+        // 10) Lens-Flare Sparkle Generator
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            // Random position near the center/card area
+            sparkle.style.top = `${50 + (Math.random() - 0.5) * 40}vh`;
+            sparkle.style.left = `${50 + (Math.random() - 0.5) * 40}vw`;
+            sparkle.style.animationDelay = `${Math.random() * 2}s`;
+            sparkle.style.animationDuration = `${(Math.random() * 1) + 1.5}s`;
+            sparkleContainer.appendChild(sparkle);
+
+            setTimeout(() => sparkle.remove(), 3000); 
+        }
+
+
+        // --- Main Execution & Audio Control ---
+        window.onload = function () {
+            // Initialize 3D
+            initThreeJS();
+            animateThreeJS(); 
+
+            // Initialize Background Stars
+            createStars();
+            
+            // 4) Reduced Confetti Rate (from 100ms to 300ms)
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createConfettiPiece, Math.random() * 3000);
+            }
+            setInterval(createConfettiPiece, 300); 
+            
+            // Initialize Sparkles
+            setInterval(createSparkle, 500); 
+
+            // Handle Resize
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // 3) & 6) Audio Autoplay Fallback and Mute Button Logic
+            const audio = document.querySelector("#bg-music"); // Use the ID
+            const muteBtn = document.getElementById("muteBtn");
+            
+            // 3) Autoplay Fallback: Try to play on first user interaction
+            document.addEventListener("click", () => {
+                if (audio.paused && !audio.muted) {
+                    audio.play().catch(e => console.log("Audio autoplay failed, waiting for user click."));
+                }
+            }, { once: true });
+
+            // 6) Mute Button Logic
+            muteBtn.onclick = () => {
+                audio.muted = !audio.muted;
+                muteBtn.textContent = audio.muted ? "🔇 ปิดเสียง" : "🔊 เสียง";
+            };
+
+            // Initialize button text based on current state (default is unmuted)
+            muteBtn.textContent = audio.muted ? "🔇 ปิดเสียง" : "🔊 เสียง";
+        };
+    </script>
+</body>
+</html>
