@@ -52,6 +52,12 @@
             z-index: 1; 
         }
 
+        /* (3) FIX: Ensure Three.js canvas fills the fixed container correctly on mobile */
+        #scene-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
         .birthday-card-wrapper {
             position: relative;
             z-index: 10;
@@ -205,12 +211,13 @@
         }
         
         /* (2) Wrapper that allows scrolling and padding */
+        /* แก้ไข: ลบ min-h-screen และใช้ padding/flex สำหรับการจัดกึ่งกลางที่ปลอดภัย */
         main {
             position: relative;
             z-index: 10;
             width: 100%;
             padding: 2rem 1rem 120px 1rem; /* Added horizontal padding to match p-4 removed from body */
-            /* Used flex and min-h-screen to maintain vertical centering when content is short */
+            /* ใช้ flex และ min-h-screen เพื่อจัดกึ่งกลางในแนวตั้งเมื่อเนื้อหาน้อย */
         }
     </style>
 </head>
@@ -237,8 +244,8 @@
     <!-- 10) Sparkle Overlay -->
     <div id="sparkle-container" class="sparkle-container"></div>
 
-    <!-- (3) Birthday Card Content Wrapped in <main> with centering classes -->
-    <main class="flex items-center justify-center min-h-screen">
+    <!-- (1) UPDATED: เปลี่ยน class ของ main เพื่อแก้ปัญหาการแสดงผลบนมือถือ -->
+    <main class="flex justify-center py-10 px-4 w-full">
         <!-- Birthday Card Wrapper -->
         <div class="birthday-card-wrapper relative"> 
             <div class="birthday-card mx-auto rounded-3xl text-white">
@@ -251,13 +258,13 @@
                 <!-- Image Section (5, 7) Soft Glow & Hover -->
                 <div class="text-center mb-8">
                     <!-- 
-                        UPDATED: ใช้ชุดรูปภาพสไลด์โชว์
+                        (2) UPDATED: ปรับขนาด max-width สำหรับมือถือให้ปลอดภัยยิ่งขึ้น
                     -->
                     <img 
                         id="birthday-image"
                         src="image/pee.jpg" 
                         alt="รูป ลุงและพี่" 
-                        class="rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm h-auto object-cover mx-auto img-soft-glow" 
+                        class="rounded-3xl shadow-2xl w-full max-w-[280px] sm:max-w-[360px] h-auto object-cover mx-auto img-soft-glow" 
                         loading="lazy"
                     />
                 </div>
@@ -271,8 +278,6 @@
                 <p class="text-lg sm:text-xl text-center mt-6 font-bold italic signature-glow">
                     ด้วยรักและเคารพจากสาธุ หลานรัก & น้องสุดหล่อเท่
                 </p>
-
-                <!-- REMOVED: ข้อความตัวเล็กที่มาแบบช้า ๆ -->
                 
             </div>
         </div>
